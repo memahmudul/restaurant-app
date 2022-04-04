@@ -6,12 +6,18 @@ import AVATAR from "../images/avatar.png"
 import { FaShoppingCart } from "react-icons/fa";
 import {motion} from "framer-motion"
 import { Link } from 'react-router-dom';
+import { useStateValue } from '../context/StateProvider';
+import { actionType } from '../context/reducer';
 function Header() {
+  const [state,dispatch] = useStateValue();
   const firebaseAuth = getAuth(app);
   const provider = new GoogleAuthProvider();
   const login = async()=>{
-    const response = await signInWithPopup(firebaseAuth,provider);
-    console.log(response);
+    const {user:{refreshToken,providerData}} = await signInWithPopup(firebaseAuth,provider);
+    dispatch({
+      type: actionType.SET_USER,
+      payload: providerData[0]
+    })
 
   }
   return (
@@ -35,7 +41,7 @@ function Header() {
     <p className='absolute -top-4 left-3 w-6 h-6 bg-red-400 rounded-full flex items-center justify-center'>10</p>
 
     </div>
-    <motion.img whileTap={{scale:0.6}} src={AVATAR} alt="" onClick={login} className='w-10 ml-8 cursor-pointer drop-shadow-md'/>
+    <motion.img whileTap={{scale:0.6}} src={state.user? state.user.photoURL : AVATAR} alt="" onClick={login} className='w-10 ml-8 cursor-pointer drop-shadow-md rounded-full'/>
 
     </div>
     {/*mobile */}
